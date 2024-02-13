@@ -64,7 +64,7 @@ To run the app, either:
 - Open up a terminal, navigate to the directory of your choosing and run the command bellow.
 
   ```
-  git clone https://github.com/kuvk/cs50x-book-of-ingest.git
+  git clone https://github.com/kuvk/cs50x-final-project.git
   ```
 <br>
 
