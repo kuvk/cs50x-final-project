@@ -1,0 +1,181 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    Ingest
+{% endblock title %}
+
+{% block header %}
+    {% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+
+<div class="container-md p-3 mt-5 justify-content-center text-secondary">
+    {# Ingest Header #}
+    <div class="row align-items-end">
+        <h1 class="h3 mb-1 fw-bold"><i class="bi bi-journal-text me-2"></i>Ingest</h1>
+        <hr class="mb-5 mt-1 border-primary">
+    </div>
+
+    {# Flashed messages #}
+    {% include "base/flashed_messages.html" %}
+    
+    {# Ingest Days Help #}
+    <div id="ingestDaysHelp" class="row justify-content-center align-items-center text-center">
+        <p class="px-5">
+            To start, first create a day by clicking <strong><i class="bi bi-plus-circle mx-1"></i>Add</strong>, enter name, choose a date and submit. <br>
+            To start logging ingests, edit day information or delete day, click on <i class="bi bi-pencil-fill mx-1"></i> next to day. <br>
+            To delete all days click <i class="bi bi-x-circle mx-1"></i><strong>Clear</strong>.
+        </p>  
+    </div>
+
+    {# Days header #}
+    <div class="row mt-5 align-items-end">
+        <div class="col">
+            <h4 class="mb-1 fw-bold"><i class="bi bi-calendar-fill me-2"></i><span>Days</span></h4>
+        </div>
+        <div class="col text-end text-bottom">
+            {# Add Day - Collapse button #}
+            <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#addDayCollapse" role="button" aria-expanded="false" aria-controls="addDayCollapse">
+                <span><i class="bi bi-plus-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Add</span>
+            </a>
+
+            {% if days %}
+                {# Deleta all Days Modal Show button #}
+                <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#clearDays">
+                    <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                    <span class="d-none d-sm-inline align-middle">Clear</span>
+                </a>
+                {# Deleta all Days Modal #}
+                <div class="modal fade" id="clearDays" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="clearDaysLabel" aria-hidden="true">
+                    <div class="modal-dialog text-primary">
+                        <div class="modal-content text-center">
+                            <div class="modal-header justify-content-center">
+                                <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                            </div>
+                            <div class="modal-body" id="clearDaysLabel">
+                                
+                                <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                                <p><span class="text-danger fs-5 align-middle"><strong>Delete all days</strong></span></p>
+                                <p>
+                                    All ingests will be lost.<br>
+                                    <strong>This action cannot be undone!</strong> 
+                                </p>
+                            </div>
+                            {# Cancel and Delete buttons #}
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                                <a href="{{ url_for('clear_days') }}" role="button" method="post" class="btn btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <hr class="my-1 border-primary">
+        {# Days count  #}
+        <div class="row mb-4 mt-0">
+            <h6 class="fw-bold">Total: {{ count }}</h6>
+        </div>
+    </div>
+    
+    {# Add Day Collapse Form #}
+    <div class="collapse" id="addDayCollapse">
+        <form action="/ingest" method="post" class="row g-3 mb-3 align-items-center justify-content-center" aria-describedby="#ingestDaysHelp">
+            {{ form.hidden_tag() }}
+            <div class="col-8 col-md-2">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control form-control-sm") }}
+            </div>
+        
+            <div class="col-8 col-md-2">
+                {{ form.date.label(class="form-label") }}
+                {{ form.date(class="form-control form-control-sm") }}
+            </div>
+            <div class="col-8 col-md-2 text-center text-md-start align-self-end">
+                {{ form.submit(class="btn btn-sm btn-secondary fw-bold mt-3") }}
+            </div>
+        </form>
+        {# Add Day - Collapse hide button #}
+        <div class="d-block text-center mt-5">
+            <a class="text-decoration-none fs-5 mt-5 fw-bold" data-bs-toggle="collapse" href="#addDayCollapse" role="button" aria-expanded="true" aria-controls="addDayCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary">
+    </div>
+    
+    {# Days #}
+    <div class="row">
+        {% if days %}
+        {# Table #}
+        <table class="table py-3 table-borderless text-center" id="daysTable">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col" class="col-1">Manage</th>
+                    <th scope="col">Day</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Ingests</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in days %}
+                <tr scope="row">
+                    <td>
+                        <a class="text-decoration-none fw-bold" href="{{ url_for('ingest_day', id=day.id) }}">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                    </td>
+                    <td>{{ day }}</td>
+                    <td>{{ day.date.strftime("%d %b %Y") }}</td>
+
+                    {% if day.day_ingests %}
+                        <td>{{ day.day_ingests|count }}</td>
+
+                    {% else %}
+                        <td>None</td>
+
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        {# No days #}
+        <div class="text-center fs-5">
+            No <strong>Days</strong> added yet.
+        </div>
+        
+        {% endif %}
+    </div>
+  
+</div>
+
+{% endblock main %}
+
+{% block footer %}
+    {% include "base/footer.html" %}
+{% endblock footer %}
+
+{% block js %}
+
+{% if days %}
+{# Days DataTable #}
+<script>
+    const table = new DataTable('#daysTable', {
+        order:[],
+        columnDefs: [
+            { targets: 0, searchable: false, orderable: false },
+            { className: 'dt-head-center', targets: "_all" }
+        ],
+    });
+</script>
+
+{% endif %}
+
+{% endblock js %}

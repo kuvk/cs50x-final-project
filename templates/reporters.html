@@ -1,0 +1,203 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    Reporters
+{% endblock title %}
+
+{% block header %}
+{% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+
+<div class="container-md p-3 my-5 justify-content-center text-secondary">
+    {# Reporters header #}
+    <div class="row align-items-end">
+        <div class="col">
+            <h1 class="h3 mb-0 mb-sm-1 fw-bold"><i class="bi bi-people-fill me-2"></i>Reporters</h1>
+        </div>
+        <hr class="mb-5 mt-1 border-primary">
+    </div>
+
+    {# Flashed messages #}
+    {% include "base/flashed_messages.html" %}
+
+    {# Manage section for users with Admin privilege #}
+    {% if session["privilege"] == "Admin" %}
+
+        {# Reporters Help #}
+        <div id="reporterHelp" class="row px-md-5 justify-content-center align-items-center text-center">
+            <p class="px-5 m-0">
+                To add reporter, simply click <strong><i class="bi bi-plus-circle mx-1"></i>Add</strong>, enter reporter name and submit. <br> If you wish to assign cards, edit information, or delete reporter, click <i class="bi bi-pencil-fill mx-1"></i> next to reporter name. <br> To delete all reporters click <i class="bi bi-x-circle mx-1"></i><strong>Clear</strong>.
+            </p>
+        </div>
+
+        {# Reporters Manage header #}
+        <div class="row mt-5 align-items-end">
+            <div class="col">
+                <h4 class="fw-bold"><i class="bi bi-sliders me-2"></i><span class="d-none d-sm-inline">Manage</span></h4>
+            </div>
+
+            <div class="col-8 col-sm text-end text-bottom">
+                {# Add Reporter Collapse Show button #}
+                <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#addReporterCollapse" role="button" aria-expanded="false" aria-controls="addReporterCollapse">
+                    <span><i class="bi bi-plus-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                    <span class="d-none d-sm-inline align-middle">Add</span>
+                </a>
+
+                {% if reporters %}
+                {# Delete All Modal Show button #}
+                <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#clearReporters">
+                    <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                    <span class="d-none d-sm-inline align-middle">Clear</span>
+                </a>
+
+                {# Delete All Modal #}
+                <div class="modal fade" id="clearReporters" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="clearReportersLabel" aria-hidden="true">
+                    <div class="modal-dialog text-primary">
+                        <div class="modal-content text-center">
+                            <div class="modal-header justify-content-center">
+                                <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                            </div>
+                            <div class="modal-body" id="clearReportersLabel">
+                                
+                                <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                                <p><span class="text-danger fs-5 align-middle"><strong>Delete all reporters</strong></span></p>
+                                <p>
+                                    All ingests will be lost.<br>
+                                    <strong>This action cannot be undone!</strong> 
+                                </p>
+                            </div>
+                            {# Cancel and Delete buttons #}
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                                <a href="{{ url_for('clear_reporters') }}" role="button" method="post" class="btn btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                {% endif %}
+            </div>
+            
+            <hr class="my-1 border-primary">
+            {# Reporters count  #}
+            <div class="row mb-4 mt-0">
+                <h6 class="fw-bold">Total: {{ count }}</h6>
+            </div>
+        </div>
+
+        {# Add Reporter Collapse Form #}
+        <div class="collapse" id="addReporterCollapse">    
+            <form action="/reporters" method="post" class="row g-3 px-3 align-items-center justify-content-center" aria-describedby="#reporterHelp">
+                {{ form.hidden_tag() }}
+                <div class="col-8 col-sm-3 col-md-2">
+                    {{ form.name.label(class="form-label col-8 col-sm-6 col-md-4 col-lg-2") }}
+                    {{ form.name(class="form-control form-control-sm", aria_label="Name")}}
+                </div>
+                <div class="col-8 col-sm-3 col-md-2 text-center text-sm-start align-self-end">
+                    {{ form.submit(class="btn btn-sm btn-secondary shadow mt-3")}}
+                </div>
+            </form>
+            {# Add Reporter Collapse Hide button #}
+            <div class="d-block text-center mt-5">
+                <a class="text-decoration-none mt-5 fs-5 fw-bold" data-bs-toggle="collapse" href="#addReporterCollapse" role="button" aria-expanded="true" aria-controls="addReporterCollapse">
+                    <span><i class="bi bi-arrow-up  align-middle"></i></span>
+                    <span class="ms-1 align-middle">Hide</span>
+                </a>
+            </div>
+            <hr class="my-5 border-primary">  
+        </div>
+
+    {# user not Admin #}
+    {% else %}
+        {# Reporters Help - assign cards part #}
+        <div id="reporterHelp" class="row px-md-5 mb-5 justify-content-center align-items-center text-center">
+            <p class="px-5 fs-5 m-0">
+                To assign cards, click <i class="bi bi-pencil-fill mx-1"></i> next to reporter name. 
+            </p>
+        </div>
+
+    {% endif %}
+    
+    {# Reporters #} 
+    <div class="row">
+        {% if reporters %}
+        {# Table #}
+        <table id="reportersTable" class="table table-borderless table-sm text-center responsive nowrap align-middle mt-0" width="100%">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col" class="col-1">Manage</th>
+                    <th scope="col" class="col-2">Name</th>
+                    <th scope="col">Latest Ingest</th>
+                    <th scope="col">Cards</th>      
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporter in reporters %}
+                <tr scope="row">
+                    {# Edit Reporter button #}
+                    <td>
+                        <a class="text-decoration-none fw-bold" href="{{ url_for('manage_reporter', id=reporter.id) }}">
+                            <i class="bi bi-pencil-fill align-middle"></i>
+                        </a>
+                    </td>
+                    <td>{{ reporter.name }}</td>
+
+                    {# Reporter ingests count #}
+                    {% if reporter.reporter_ingests %}
+                        {% set ingest = reporter.reporter_ingests|last %}
+                        <td>
+                            <a class="text-decoration-none text-primary fw-bold" href="{{ url_for('ingest_day', id=ingest.day.id) }}">
+                                {{ ingest.day }} - {{ ingest.reporter }}
+                            </a>
+                        </td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
+
+                    {# Reporter cards count #}
+                    {% if reporter.inventory %}
+                        <td>{{ reporter.inventory|count }}</td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+            {# No Reporters #}
+            <div class="text-center fs-5">
+                No <strong>Reporters</strong> present in the database.
+            </div>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock main %}
+
+{% block footer %}
+{% include "base/footer.html" %}
+{% endblock footer%}
+
+{% block js %}
+
+    {% if reporters %}
+    {# Reporters DataTable #}
+    <script>
+        const table = new DataTable('#reportersTable', {
+            order:[],
+            columnDefs: [
+                { searchable: false, orderable: false, targets: [0, 3] },
+                { className: 'dt-head-center', targets: "_all" }
+            ],
+        });
+    </script>
+
+    {% endif %}
+
+{% endblock js%}

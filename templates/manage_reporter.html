@@ -1,0 +1,401 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    Manage {{ reporter.name }}
+{% endblock title %}
+
+{% block header %}
+    {% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+{# Manage Reporter Main Content #}
+<div class="container-md p-3 my-5 justify-content-center text-secondary">
+    {# Manage Reporter header #}
+    <div class="row align-items-end">
+        <div class="col">
+            <h1 class="h3 mb-1 fw-bold"><i class="bi bi-person-fill me-2"></i><span>{{ reporter.name }}</span></h1>
+        </div>
+        {# Manage section for users with Admin privilege #}
+        {% if session["privilege"] == "Admin" %}
+            <div class="col-7 col-sm text-end text-bottom">
+                {# Edit Reporter Collpase Show button  #}
+                <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#editReporterCollapse" role="button" aria-expanded="false" aria-controls="editReporterCollapse">
+                    <span><i class="bi bi-pencil-fill align-middle me-1 mb-2 mb-sm-0"></i></span>
+                    <span class="d-none d-sm-inline align-middle">Edit</span>
+                </a>
+                {# Delete Reporter Modal Show button #}
+                <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#deleteReporter">
+                    <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                    <span class="d-none d-sm-inline align-middle">Delete</span>
+                </a>
+            </div>
+        {% endif %}
+
+        <hr class="my-1 border-primary">
+        {# Reporter ingests count  #}
+        <div class="row mb-4 mt-0">
+            <h6 class="fw-bold">Ingests: {{ reporter.reporter_ingests|count }}</h6>
+        </div>
+    </div>
+
+    {# Flashed messages #}
+    {% include "base/flashed_messages.html" %}
+
+    {# If user is Admin #}
+    {% if session["privilege"] == "Admin" %}
+        {# Delete Reporter Modal #}
+        <div class="modal fade" id="deleteReporter" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="deleteReporterLabel" aria-hidden="true">
+            <div class="modal-dialog text-primary">
+                <div class="modal-content text-center">
+                    <div class="modal-header justify-content-center">
+                        <h1 class="modal-title fs-5 fw-bold" id="deleteReporterLabel">Are you sure?</h1>
+                    </div>
+                    <div class="modal-body">
+                        <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                        <p><span class="text-danger fs-5">Reporter: <strong>{{ reporter.name }}</strong></span></p>
+                        <p>
+                            All ingests assosiated with reporter will be lost. <br><strong>This action cannot be undone!</strong>
+                            
+                        </p>
+                    </div>
+                    {# Cancel and Delete buttons #}
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{{ url_for('delete_reporter', id=reporter.id) }}" role="button" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Edit Reporter Collapse Form #}
+        <div class="collapse" id="editReporterCollapse">
+            <form action="/reporters/manage/{{ reporter.id }}"  method="post" class="row g-3 px-3 align-items-center justify-content-center" aria-describedby="#manageReporterHelp">
+                {{ form.hidden_tag() }}
+                <div class="col-8 col-sm-3 col-lg-2">
+                    {{ form.name.label(class="form-label col-8 col-sm-6 col-md-4 col-lg-2") }}
+                    {{ form.name(class="form-control form-control-sm", aria_label="Name")}}
+                </div>
+                <div class="col-8 col-sm-2 col-lg-1 text-center text-sm-start align-self-end">
+                    {{ form.submit(class="btn btn-sm btn-secondary shadow mt-3")}}
+                </div>
+            </form>
+            <div class="d-block text-center mt-5">
+                <a class="text-decoration-none mt-5 fs-5 fw-bold" data-bs-toggle="collapse" href="#editReporterCollapse" role="button" aria-expanded="true" aria-controls="editReporterCollapse">
+                    <span><i class="bi bi-arrow-up align-middle"></i></span>
+                    <span class="ms-1 align-middle">Hide</span>
+                </a>
+            </div>
+            <hr class="my-5 border-primary">    
+        </div>
+        
+        {# Manage Reporter Help #}
+        <div id="manageReporterHelp" class="row justify-content-center align-items-center text-center text-secondary">
+            <p class="px-5">
+                To edit reporter name, click <strong><i class="bi bi-pencil-fill mx-1"></i>Edit</strong>. 
+                <br>To delete reporter click <strong><i class="bi bi-x-circle mx-1"></i>Delete</strong>. 
+                <br>To assign reporter cards, click <strong><i class="bi bi-list-check mx-1"></i>Assign</strong>, check the cards and submit.
+                <br>To clear reporter inventory, click <strong><i class="bi bi-box-arrow-in-left mx-1"></i>Return all</strong>. 
+                <br>To return single card, click <i class="bi bi-box-arrow-in-left mx-1"></i> next to card.
+            </p>
+            {# Return to Reporters Link #}
+            <a class="text-decoration-none align-self-end" href="{{ url_for('reporters') }}">
+                <i class="bi bi-arrow-left me-2"></i>
+                <strong>Back to Reporters</strong>
+            </a>
+        </div>
+
+    {# user not Admin #}
+    {% else %}
+        {# Manage Reporter Help - assign and return cards part #}
+        <div id="manageReporterHelp" class="row justify-content-center align-items-center text-center text-secondary">
+            <p class="px-5">
+                <br>To assign reporter cards, click <strong><i class="bi bi-list-check mx-1"></i>Assign</strong>, check the cards and submit.
+                <br>To clear reporter inventory, click <strong><i class="bi bi-box-arrow-in-left mx-1"></i>Return all</strong>. 
+                <br>To return single card, click <i class="bi bi-box-arrow-in-left mx-1"></i> next to card.
+            </p>
+            {# Return to Reporters Link #}
+            <a class="text-decoration-none align-self-end" href="{{ url_for('reporters') }}">
+                <i class="bi bi-arrow-left me-2"></i>
+                <strong>Back to Reporters</strong>
+            </a>
+        </div>
+    {% endif %}
+
+    {# Reporter Inventory header #}
+    <div class="row mt-5 align-items-end">
+        <div class="col">
+            <h4 class="fw-bold"><i class="bi bi-box-seam-fill me-2"></i><span class="d-none d-sm-inline">Inventory</span></h4>
+        </div>
+        <div class="col text-end text-bottom">
+            {# Assign Cards Collapse Show button #}
+            <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#assignCardsCollapse" role="button" aria-expanded="false" aria-controls="assignCardsCollapse">
+                <span><i class="bi bi-list-check align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Assign</span>
+            </a>
+        </div>
+        <hr class="my-1 border-primary">
+        {# Reporter cards count  #}
+        <div class="row mb-4 mt-0">
+            <h6 class="fw-bold">Cards: {{ reporter.inventory|count }}</h6>
+        </div>
+    </div>
+
+    {# Assign Cards Collapse #}
+    <div class="collapse" id="assignCardsCollapse">
+        {% if cards %}
+            {# Form to submit checked cards #}
+            <form action="/reporters/manage/{{ reporter.id }}/assign" method="post" class="row justify-content-center" aria-describedby="#manageReporterHelp">
+                <div class="col-8">
+                    {# Table Search and Submit button #}
+                    <div class="d-flex flex-row justify-content-between my-2">
+                        <div id="searchPlaceAssign"></div>
+                        <div class="d-inline align-self-end ms-2">
+                        <button type="submit" class="btn btn-sm btn-secondary shadow py-1 "><i class="bi bi-list-check align-middle me-1"></i><span class="d-none d-sm-inline align-middle">Submit</span></button>
+                        </div>
+                    </div>
+                    {# Table #}
+                    <table id="assignCards" class="table table-borderless table-sm text-center responsive nowrap align-middle mt-0" width="100%">  
+                        <thead class="table-primary">
+                            <tr>
+                                <th scope="col">Group</th>
+                                <th scope="col">Card</th>
+                                <th scope="col">Type</th>
+                                <th scope="col"><i class="bi bi-list-check align-middle"></i></th>
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            {% for card in cards %}
+                            <tr scope="row">
+                                <td>{{ card.card_label }}</td>
+                                <td>{{ card }}</td>
+                                <td>{{ card.card_type|title }}</td>
+                                {# Chekbox for each card #}
+                                <td>
+                                    <input class="form-check-input" type="checkbox" name="assign_card" value="{{ card.id }}">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        
+        {% else %}
+            {# In case there are no cards #}
+            <div class="row text-center">
+                <p class="fs-5">
+                    <strong>No Cards</strong> that can be assigned.    
+                </p>
+                <a class="text-decoration-none align-self-end" href="{{ url_for('inventory') }}">
+                    <i class="bi bi-arrow-right me-2"></i>
+                    <strong>Go to Inventory</strong>
+                </a>
+            </div>
+
+        {% endif %}
+        {# Assign Cards Collapse Hide button #}
+        <div class="d-block text-center mt-5">
+            <a class="text-decoration-none fs-5 fw-bold " data-bs-toggle="collapse" href="#assignCardsCollapse" role="button" aria-expanded="true" aria-controls="assignCardsCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary">
+    </div>
+
+    {# Reporter Inventory #}
+    <div class="row justify-content-center" aria-describedby="#manageReporterHelp">
+        {# Inventory #}
+        {% if reporter.inventory %}
+            <div class="col-8">
+                {# Table Search and Return all button #}
+                <div class="d-flex justify-content-between my-2">
+                    <div id="searchPlaceInventory"></div>
+                    <div class="d-inline align-self-end ms-2">
+                        
+                        <a type="button" class="btn btn-sm btn-secondary shadow" href="{{ url_for('return_reporter_cards', reporter=reporter.id, card='all') }}"><i class="bi bi-box-arrow-in-left align-middle me-sm-1"></i><span class="d-none d-sm-inline align-middle">Return all</span></a>
+                    </div>
+                </div>
+                {# Table #}
+                <table id="returnCards" class="table table-borderless table-sm text-center responsive nowrap align-middle mt-0" width="100%">  
+                    <thead class="table-primary">
+                        <tr>
+                            <th scope="col">Group</th>
+                            <th scope="col">Card</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Return</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        {% for card in reporter.inventory %}
+                        <tr scope="row">
+                            <td>{{ card.card_label }}</td>
+                            <td>{{ card }}</td>
+                            <td>{{ card.card_type|title }}</td>
+                            {# Return card button #}
+                            <td>
+                                <a class="text-decoration-none return-card text-primary fs-5" type="button" name="{{ reporter.id }}" id="{{ card.id }}">
+                                    <i class="bi bi-box-arrow-in-left align-middle"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {# Inventory Empty #}
+        {% else %}
+            <div class="row">
+                <p class="fs-5 text-center">
+                    {{ reporter.name }} inventory <strong>Empty</strong>. No cards assigned.
+                </p>
+            </div>
+
+        {% endif %}
+    </div>
+ 
+</div>
+
+{% endblock main %}
+
+{% block footer %}
+    {% include "base/footer.html" %}
+{% endblock footer%}
+
+{% block js %}
+
+{% if cards %}
+    {# Assign Cards DataTable #}
+    <script>
+        // Create DataTable
+        // Define subheading data column - Card type and label
+        var groupColumn = 0;
+        var table = $('#assignCards').DataTable({
+            // Define columns
+            columnDefs: [
+                { visible: false, targets: groupColumn }, // hide subheading column
+                { className: 'dt-head-center', targets: '_all' },
+                { searchable: false, orderable: false, targets: -1 }
+            ],
+            order: [[groupColumn, 'asc']],
+            paging: false,
+            scrollCollapse: true,
+            scrollY: '450px',
+
+            // Create subheadings by grouping data in column and reorder to rows
+            drawCallback: function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+        
+                api.column(groupColumn, { page: 'current' })
+                    .data()
+                    .each(function (group, i) {
+                        if (last !== group) {
+                            $(rows)
+                                .eq(i)
+                                .before(
+                                    '<tr class="group fw-bold table-light text-start"><td colspan="3" class="ps-3">' +
+                                        group +
+                                        '</td></tr>'
+                                );
+        
+                            last = group;
+                        }
+                    });
+            },   
+        });
+
+        // Order on subheading click 
+        $('#assignCards tbody').on('click', 'tr.group', function () {
+            var currentOrder = table.order()[0];
+            if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+                table.order([groupColumn, 'desc']).draw();
+            }
+            else {
+                table.order([groupColumn, 'asc']).draw();
+            }
+        });
+
+        // Adjust thead width to 100% when collapse is shown
+        $('#assignCardsCollapse').on('shown.bs.collapse', function () {
+            table.columns.adjust().draw();
+        });
+
+        // Change table Search to specific div, to change position
+        $("#searchPlaceAssign").html($("#assignCards_filter"));   
+    </script>
+
+{% endif %}
+
+{% if reporter.inventory %}
+    {# Reporter Inventory DataTable #}
+    <script>
+        // Create DataTable
+        // Define subheading data column - Card type and label
+        var groupColumn = 0; 
+        var inventory = $('#returnCards').DataTable({
+            // Define columns
+            columnDefs: [
+                { visible: false, targets: groupColumn }, // hide subheading column
+                { className: 'dt-head-center', targets: '_all' },
+                { orderable: false, targets: -1 }
+            ],
+            order: [[groupColumn, 'asc']],
+            paging: false,
+            info: false,
+            scrollCollapse: true,
+            scrollY: '450px',
+            
+            // Create subheadings by grouping data in column and reorder to rows
+            drawCallback: function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+        
+                api.column(groupColumn, { page: 'current' })
+                    .data()
+                    .each(function (group, i) {
+                        if (last !== group) {
+                            $(rows)
+                                .eq(i)
+                                .before(
+                                    '<tr class="group fw-bold table-light text-start"><td colspan="3" class="ps-3">' +
+                                        group +
+                                        '</td></tr>'
+                                );
+        
+                            last = group;
+                        }
+                    });
+            },  
+        });
+
+        // Reorder on subheading click 
+        $('#returnCards tbody').on('click', 'tr.group', function () {
+            var currentOrder = inventory.order()[0];
+            if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+                inventory.order([groupColumn, 'desc']).draw();
+            }
+            else {
+                inventory.order([groupColumn, 'asc']).draw();
+            }
+        });
+
+        // Change table Search to specific div, to change position
+        $("#searchPlaceInventory").html($("#returnCards_filter"));
+
+        // Return card to Base button
+        $(".return-card").on("click", function () {
+            var reporter = $(this).attr("name");
+            var card = $(this).attr("id");
+            
+            window.location.href = '/reporters/manage/' + reporter + '/return/' + card;
+        }); 
+    </script>
+
+{% endif %}
+
+{% endblock js %}

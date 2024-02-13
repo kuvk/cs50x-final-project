@@ -1,0 +1,350 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    Inventory
+{% endblock title %}
+
+{% block header %}
+{% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+
+<div class="container-md p-3 mt-5 justify-content-center text-secondary">
+    {# Cards Inventory header #}
+    <div class="row align-items-end">
+        <div class="col">
+            <h1 class="h3 mb-1 fw-bold"><i class="bi bi-box-seam-fill me-2"></i>Inventory</h1>
+        </div>
+        <hr class="mb-5 mt-1 border-primary">
+    </div>
+
+    {# Flashed messages #}
+    {% include "base/flashed_messages.html" %}
+      
+    {# Inventory Help #}
+    <div id="inventoryHelp" class="row justify-content-center align-items-center text-center text-secondary">
+        {# For users with Admin privilege #}
+        {% if session["privilege"] == "Admin" %}
+            <p class="px-5">
+                To add cards, simply click <strong><i class="bi bi-plus-circle mx-1"></i>Add</strong>, select card/s type, enter card/s label and quantity, and submit. <br> To delete a single card, click <i class="bi bi-x-circle mx-1"></i> next to card.<br> To delete all cards click <i class="bi bi-x-circle mx-1"></i><strong>Clear</strong>.<br> To return assigned card to <strong>Base</strong>, click <i class="bi bi-box-arrow-in-left mx-1"></i> next to card. <br>
+                If a card is assigned to reporter, you can clik on <strong>reporter name</strong>, to go to that reporter page. <br>
+                To assign cards:
+            </p>
+
+        {# For users with Ingest privilege #}
+        {% else %}
+            <p class="px-5">
+                To return assigned card to <strong>Base</strong>, click <i class="bi bi-box-arrow-in-left mx-1"></i> next to card. <br>
+                If a card is assigned to reporter, you can clik on <strong>reporter name</strong>, to go to that reporter page. <br>
+                To assign cards:
+            </p>
+
+        {% endif %}
+        {# Go to Reporters Link #}
+        <p class="px-5 m-0">
+            <a class="text-decoration-none align-self-end me-2" href="{{ url_for('reporters') }}">
+                <i class="bi bi-arrow-right me-2"></i>
+                <strong>Go to Reporters</strong>
+            </a>
+        </p> 
+    </div>  
+
+    {# Cards header #}
+    <div class="row mt-5 align-items-end">
+        <div class="col">
+            <h4 class="mb-1 fw-bold"><i class="bi bi-sd-card-fill me-2"></i><span>Cards</span></h4>
+        </div>
+
+        {# Only for users with Admin privilege #}
+        {% if session["privilege"] == "Admin" %}
+            <div class="col text-end text-bottom">
+                {# Add Cards Collapse Show button #}
+                <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#addCardsCollapse" role="button" aria-expanded="false" aria-controls="addCardsCollapse">
+                    <span><i class="bi bi-plus-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                    <span class="d-none d-sm-inline align-middle">Add</span>
+                </a>
+
+                {% if cards %}
+                    {# Deleta All  Modal Show button #}
+                    <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#clearInventory">
+                        <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                        <span class="d-none d-sm-inline align-middle">Clear</span>
+                    </a>
+                    {# Deleta All Modal #}
+                    <div class="modal fade" id="clearInventory" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="clearInventoryLabel" aria-hidden="true">
+                        <div class="modal-dialog text-primary">
+                            <div class="modal-content text-center">
+                                <div class="modal-header justify-content-center">
+                                    <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                                </div>
+                                <div class="modal-body" id="clearInventoryLabel">
+                                    
+                                    <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                                    <p><span class="text-danger fs-5 align-middle"><strong>Delete all cards</strong></span></p>
+                                    <p>
+                                        All ingests will be lost.<br>
+                                        <strong>This action cannot be undone!</strong> 
+                                    </p>
+                                </div>
+                                {# Cancel and Delete buttons #}
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{{ url_for('clear_inventory') }}" role="button" method="post" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {# Delete Card Modal #}
+                    <div class="modal fade" id="deleteCardModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="deleteCardLabel" aria-hidden="true">
+                        <div class="modal-dialog text-primary">
+                            <div class="modal-content text-center">
+                                <div class="modal-header justify-content-center">
+                                    <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                                </div>
+                                <div class="modal-body" id="deleteCardLabel">
+                                    <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                                    <p><span class="text-danger fs-5 align-middle"><strong id="cardName"></strong></span></p>
+                                    <p>
+                                        All ingests assosiated with card will be lost.<br>
+                                        <strong>This action cannot be undone!</strong> 
+                                    </p>
+                                </div>
+                                {# Cancel and Delete buttons #}
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <a id="deleteCard" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <hr class="my-1 border-primary">
+        {# Cards count  #}
+        <div class="row mb-4 mt-0">
+            <h6 class="fw-bold">Total: {{ count }}</h6>
+        </div>
+    </div>
+
+    {# Add Cards Collapse Form #}
+    <div class="collapse" id="addCardsCollapse">  
+        <form action="/inventory" method="post" class="row g-3 mb-3 align-items-center justify-content-center" aria-describedby="#inventoryHelp">
+            {{ form.hidden_tag() }}
+            <div class="col-8 col-sm-4 col-md-2">
+                {{ form.card_type.label(class="form-label") }}
+                {{ form.card_type(class="form-select form-select-sm", aria_label="Card Type") }}
+            </div>
+            <div class="col-8 col-sm-4 col-md-2">
+                {{ form.card_label.label(class="form-label") }}
+                {{ form.card_label(class="form-control form-control-sm", autofocus="", aria_label="Card Label") }}
+            </div>
+            <div class="col-8 col-sm-4 col-md-2">
+                {{ form.card_qty.label(class="form-label") }}
+                {{ form.card_qty(class="form-control  form-control-sm", aria_label="Card Quantity") }}
+            </div>
+            <div class="col-8 col-md-2 col-lg-1 text-center text-md-start align-self-end">
+                {{ form.submit(class="btn btn-sm btn-secondary fw-bold my-3 my-md-0") }}
+            </div>
+        </form>
+        {# Add Cards - Collapse Hide button #}
+        <div class="d-block text-center mt-5">
+            <a class="text-decoration-none fs-5 mt-5 fw-bold" data-bs-toggle="collapse" href="#addCardsCollapse" role="button" aria-expanded="true" aria-controls="addCardsCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary">
+    </div>
+
+    {# Cards #}  
+    <div class="row">
+        {% if cards %}
+        {# Table #}
+        <table id="allCards" class="table table-borderless table-sm text-center responsive nowrap align-middle mt-0" width="100%">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col" class="col-1">Group</th>
+                    <th scope="col" class="col-2">Type</th>
+                    <th scope="col" class="col-1">Card</th>
+                    <th scope="col" class="col-4">Latest Ingest</th>
+                    <th scope="col" class="col-3">Assigned</th>
+                    <th scope="col" class="col-1">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for card in cards %}
+                <tr scope="row">
+                    <td>{{ card.card_label }}</td>
+                    <td>{{ card.card_type | capitalize }}</td>
+                    <td>{{ card }}</td>
+                    {# Link to latest ingest's Day #}
+                    {% if card.card_ingests %}
+                    {% set ingest = card.card_ingests|last %}
+                    <td>
+                        <a class="text-decoration-none text-primary fw-bold" href="{{ url_for('ingest_day', id=ingest.day.id) }}">
+                            {{ ingest.day }} - {{ ingest.reporter }}
+                        </a>
+                    </td>
+                    
+                    {% else %}
+                    <td>None</td>
+
+                    {% endif %}
+                    {# Link to Reporter #}
+                    {% if card.card_location %}
+                    <td>
+                        <a class="text-decoration-none text-primary fw-bold" href="{{ url_for('manage_reporter', id=card.owner.id) }}">
+                            {{ card.owner.name }}
+                        </a>
+                    </td> 
+    
+                    {% else %}
+                    <td>Base</td>
+
+                    {% endif %}
+                    <td>
+                        {# If card is assigned and user has admin privilege #}
+                        {% if card.card_location and session["privilege"] == "Admin" %}
+                            {# Reassign card to Base link #}
+                            <a class="text-decoration-none text-primary fw-bold" href="{{ url_for('return_cards', card=card.id) }}">
+                                <i class="bi bi-box-arrow-in-left align-middle"></i>
+                            </a>
+                            <span class="mx-1">|</span>
+                            {# Delete card link #}
+                            <a class="text-decoration-none delete-card text-danger" type="button" name="{{ card }}" id="{{ card.id }}">
+                                <i class="bi bi-x-circle align-middle"></i>
+                            </a>
+                            
+                        {# Card is not assigned and user has admin privilege #}
+                        {% elif not card.card_location and session["privilege"] == "Admin" %}
+                            <span class="mx-1">-</span>
+                            <span class="mx-1">|</span>
+                            {# Delete card link#}
+                            <a class="text-decoration-none delete-card text-danger" type="button" name="{{ card }}" id="{{ card.id }}">
+                                <i class="bi bi-x-circle align-middle"></i>
+                            </a>
+                            
+
+                        {# Card is assigned but user does not have admin privilege #}
+                        {% elif card.card_location  %}
+                            {# Reassign card to Base link #}
+                            <a class="text-decoration-none text-primary fw-bold" href="{{ url_for('return_cards', card=card.id) }}">
+                                <i class="bi bi-box-arrow-in-left align-middle"></i>
+                            </a>
+
+                        {# Card is not assigned and user does not have admin privilege #}
+                        {% else %}
+                        <span class="mx-1">-</span>
+
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody> 
+        </table>
+
+        {# Div for DataTable pagination #}
+        <div class="d-flex mt-5 justify-content-center">
+            <div id="pagination"></div>
+        </div>
+
+        {% else %}
+        {# Inventory Empty #}
+        <p class="fs-5 text-center">
+            No <strong>Cards</strong> present in the database.
+        </p>
+
+        {% endif %}
+    </div>
+    
+</div>
+   
+{% endblock main %}
+
+{% block footer %}
+{% include "base/footer.html" %}
+{% endblock footer %}
+
+{% block js %}
+
+{% if cards %}
+{# Cards DataTable and Delete Card function #}
+<script>
+    // Create DataTable
+    // Define subheading data column - Card type and label
+    var groupColumn = 0; 
+    var inventory = $('#allCards').DataTable({
+        // Define columns
+        columnDefs: [
+            { responsivePriority: 1, targets: [0, 2] },
+            { responsivePriority: 2, targets: -1 },
+            { visible: false, targets: groupColumn }, // hide subheading column
+            { className: 'dt-head-center', targets: '_all' },
+            { orderable: false, targets: -1 }
+        ],
+        order: [[groupColumn, 'asc']],
+        info: false,
+        
+        // Create subheadings by grouping data in column and reorder to rows
+        drawCallback: function (settings) {
+            var api = this.api();
+            var rows = api.rows({ page: 'current' }).nodes();
+            var last = null;
+    
+            api.column(groupColumn, { page: 'current' })
+                .data()
+                .each(function (group, i) {
+                    if (last !== group) {
+                        $(rows)
+                            .eq(i)
+                            .before(
+                                '<tr class="group fw-bold table-light text-start"><td colspan="5" class="ps-3">' +
+                                    group +
+                                    '</td></tr>'
+                            );
+    
+                        last = group;
+                    }
+                });
+        },  
+    });
+
+    // Reorder on subheading click 
+    $('#allCards tbody').on('click', 'tr.group', function () {
+        var currentOrder = inventory.order()[0];
+        if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+            inventory.order([groupColumn, 'desc']).draw();
+        }
+        else {
+            inventory.order([groupColumn, 'asc']).draw();
+        }
+    });
+
+    // Change table pagination to specific div, to change position
+    $("#pagination").html($("#allCards_paginate"));
+
+</script>
+
+{% endif %}
+
+{% if session["privilege"] == "Admin" %}
+{# Delete Card Modal trigger #}
+<script>
+    // Function to trigger deleteCardModal, pass card name to modal body and url to modal delete button  
+    $(".delete-card").on("click", function () {
+        var card = $(this).attr("name");
+        var url = '/inventory/delete/card/' + $(this).attr("id");
+
+        $("#cardName").html(card) // pass card name to modal
+        $("#deleteCard").attr("href", url); // pass url to delete button
+        $("#deleteCardModal").modal("show"); // show modal
+    });
+</script>
+
+{% endif %}
+
+{% endblock js %}

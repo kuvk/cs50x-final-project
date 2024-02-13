@@ -1,0 +1,189 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    Users
+{% endblock title %}
+
+{% block header %}
+    {% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+    {% set current_user = session["username"] %}
+    
+    <div class="container-md p-3 mt-5 justify-content-center text-secondary">
+        {# Users header #}
+        <div class="row g-0 g-sm-3 align-items-end">
+            <div class="col">
+                <h1 class="h3 mb-0 mb-sm-1 fw-bold"><i class="bi bi-people-fill me-2"></i>Users</h1>
+            </div>
+            <hr class="mb-5 mt-1 border-primary">
+        </div>
+        
+        {# Flashed messages #}
+        {% include "base/flashed_messages.html" %}
+
+        {# Users Help #}
+        <div id="userHelp" class="d-flex flex-column justify-content-center align-items-center">
+            <p class="px-5 text-center m-0">
+                To add user, simply click <strong><i class="bi bi-plus-circle mx-1"></i>Add</strong>, select user role, enter user data and submit. <br> If you wish to edit information, change role or delete user, click <i class="bi bi-pencil-fill mx-1"></i> next to user name.
+            </p>  
+        </div>
+
+        {# Users Manage header #}
+        <div class="row mt-5 align-items-end">
+            <div class="col">
+                <h4 class="fw-bold"><i class="bi bi-sliders me-2"></i><span>Manage</span></h4>
+            </div>
+            <div class="col text-end text-bottom">
+                {# Add User Collapse Show button #}
+                <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#addUserCollapse" role="button" aria-expanded="false" aria-controls="addUserCollapse">
+                    <i class="bi bi-plus-circle me-1 mb-2 mb-sm-0 align-middle"></i>
+                    <span class="d-none d-sm-inline align-middle">Add</span>
+                </a>
+                {# For admin users #}
+                {% if users and current_user == "admin" %}
+                    {# Delete All Modal Show button #}
+                    <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#clearUsers">
+                        <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                        <span class="d-none d-sm-inline align-middle">Clear</span>
+                    </a>
+                    {# Delete All Modal #}
+                    <div class="modal fade" id="clearUsers" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="clearUsersLabel" aria-hidden="true">
+                        <div class="modal-dialog text-primary">
+                            <div class="modal-content text-center">
+                                <div class="modal-header justify-content-center">
+                                    <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                                </div>
+                                <div class="modal-body" id="clearUsersLabel">
+                                    
+                                    <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                                    <p><span class="text-danger fs-5 align-middle"><strong>Delete all users</strong></span></p>
+                                    <p>
+                                        <strong>This action cannot be undone!</strong> 
+                                    </p>
+                                </div>
+                                {# Cancel and Delete buttons #}
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{{ url_for('clear_users') }}" role="button" method="post" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                {% endif %}
+            </div>
+            <hr class="my-1 border-primary">
+            {# Users count  #}
+            <div class="row mb-4 mt-0">
+                <h6 class="fw-bold">Total: {{ count }}</h6>
+            </div>
+        </div>
+
+        {# Add User Collapse Form #}
+        <div class="collapse" id="addUserCollapse">
+            <form action="/users" method="post" class="row g-3 px-3 align-items-center justify-content-between justify-content-lg-center" aria-describedby="#userHelp">
+                {{ form.hidden_tag() }}
+                <div class="col-12 col-sm-4 col-lg-2">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control form-control-sm", aria_label="Name")}}
+                </div>
+            
+                <div class="col-12 col-sm-4 col-lg-2">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control form-control-sm", autocomplete="username", aria_label="Username")}}
+                </div>
+            
+                <div class="col-12 col-sm-4 col-lg-2 ">
+                    {{ form.privilege.label(class="form-label") }}
+                    {{ form.privilege(class="form-select form-select-sm", aria_label="User role")}}      
+                </div>
+                <div class="col-12 col-sm-6 col-lg-2">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control form-control-sm", aria_label="Password", spellcheck="false", autocorrect="off", autocapitalize="off",) }}
+                </div>
+                <div class="col-12 col-sm-6 col-lg-2">
+                    {{ form.confirm.label(class="form-label") }}
+                    {{ form.confirm(class="form-control form-control-sm", aria_label="Confirm password", spellcheck="false", autocorrect="off", autocapitalize="off", aria_label="Confirm password") }}
+                </div>
+                <div class="col-12 text-center align-self-end">
+                    {{ form.submit(class="btn btn-sm btn-secondary shadow mt-3")}}
+                </div>
+            </form>
+            {# Add User Collapse Hide button #}
+            <div class="d-block text-center mt-5">
+                <a class="text-decoration-none mt-5 fs-5 fw-bold" data-bs-toggle="collapse" href="#addUserCollapse" role="button" aria-expanded="true" aria-controls="addUserCollapse">
+                    <span><i class="bi bi-arrow-up  align-middle"></i></span>
+                    <span class="ms-1 align-middle">Hide</span>
+                </a>
+            </div>
+            <hr class="my-5 border-primary">
+        </div>
+
+        {# Users #}
+        <div class="row">
+            {# Table #}
+            {% if users %}  
+                <table id="usersTable" class="table table-borderless table-sm text-center responsive nowrap align-middle mt-0" width="100%">
+                    <thead class="table-primary">
+                        <tr>
+                            <th scope="col" class="col-1">Manage</th>
+                            <th scope="col" class="col-2">Username</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+                
+                    <tbody>
+                        {% for user in users %}
+                        <tr scope="row">
+                            <td>
+                                <a href="{{ url_for('manage_user', id=user.id) }}" class="text-decoration-none fw-bold" >
+                                    <i class="bi bi-pencil-fill align-middle"></i>
+                                </a>
+                            </td>
+                            <td>{{ user.username }}</td> 
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.role.name }}</td> 
+                            <td>{{ user.date.strftime("%d %b %Y") }}</td>    
+                        </tr>
+                        {% endfor %}
+                    </tbody>   
+                </table>
+
+            {# No Users #}
+            {% else %}
+                <div class="text-center fs-5">
+                    No <strong>Users</strong> present in the database. Add some to start.
+                </div>
+
+            {% endif %}
+        </div>
+        
+    </div>
+    
+{% endblock main %}
+
+{% block footer %}
+    {% include "base/footer.html" %}
+{% endblock footer%}
+
+{% block js %}
+
+    {% if users %}
+    {# Users DataTable #}
+    <script>
+        const table = new DataTable('#usersTable', {
+            order:[],
+            columnDefs: [
+                { targets: 0, searchable: false, orderable: false },
+                { className: 'dt-head-center', targets: "_all" }
+            ],
+        });
+    </script>
+
+    {% endif %}
+
+{% endblock js %}

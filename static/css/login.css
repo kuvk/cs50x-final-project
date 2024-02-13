@@ -1,0 +1,23 @@
+/* Body background color and padding */
+body {
+	background-color: var(--bs-primary);
+	padding: 0;
+}
+
+/* Login icon */
+.bi-door-open.display-3 {
+    font-size: calc(2rem + 3.3vw);
+}
+
+/* Login page button */
+#btn-login {
+	--bs-btn-padding-x: 3rem;
+	--bs-btn-padding-y: 0.28rem;
+	--bs-btn-font-size: 1.2rem;
+}
+
+/* Login page flashed messages padding */
+.alert.alert-warning {
+    --bs-alert-padding-y: 0.35rem;
+}
+

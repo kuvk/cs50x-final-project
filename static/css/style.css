@@ -1,0 +1,97 @@
+/* Align content with fixed header */
+body { padding-top: 5.8rem; }
+
+/* Change highlighted text colors */
+::selection {
+    background-color: var(--bs-primary);
+    color: var(--bs-light);
+}
+
+/* Style for  navlinks */
+.nav-link { 
+    border: 1px;
+    text-align: center;
+    font-size: large;
+    font-weight: 700;
+}
+
+/* Active navlinks bg */
+.nav-link.active { background-color: #fff; }
+
+/* Active navlinks border radius after lg breakpoint */
+@media (min-width: 992px) {
+    .nav-link.active {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+}
+
+/* Primary button style*/
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #6B952F;
+    --bs-btn-border-color: #6B952F;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-border-color: #6B952F;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #6B952F;
+    --bs-btn-active-border-color: #6B952F;
+}
+
+/* Change form label size to small accros all pages */
+.form-label {
+    font-size: small;
+    margin-left: .1rem;
+}
+
+/* Buttons width after md breakpoint */
+@media (min-width: 768px) {
+    .btn { width: 10rem; }
+    .btn.btn-sm { width: 8rem; }
+    .btn.btn-lg { width: 13rem; }
+}
+
+/* Buttons font and line height */
+.btn {
+    --bs-btn-font-weight: 700;
+    --bs-btn-line-height: 1.6;
+}
+
+/* Link button width and padding */
+.btn.btn-link {
+    width: auto;
+    padding: 0;
+}
+
+/* Margin for DataTables Search and Paging */
+div.dataTables_wrapper div.dataTables_length,
+div.dataTables_wrapper div.dataTables_filter,
+div.dataTables_wrapper div.dataTables_info,
+div.dataTables_wrapper div.dataTables_paginate {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Primary tables colors */
+.table-primary {
+    --bs-table-color: #fff;
+    --bs-table-bg: var(--bs-primary);
+}
+
+/* Secondary tables colors */
+.table-secondary {
+    --bs-table-color: #fff;
+    --bs-table-bg: var(--bs-secondary);
+}
+
+/* Light tables colors */
+.table-light {
+    --bs-table-color: var(--bs-secondary);
+    --bs-table-bg: #dcdcdc;
+}
+
+/* Search for Book page style */
+.search-form {
+    max-width: 180px;
+    padding-bottom: .5rem;
+}

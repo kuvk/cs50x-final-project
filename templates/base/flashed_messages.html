@@ -1,0 +1,17 @@
+{% if get_flashed_messages() %}
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+
+    <div class="alert alert-{{ category }} alert-dismissible show fade mb-5 text-center" role="alert">
+        {% if category == "success" %}
+            <i class="bi bi-check-circle-fill me-2" role="img" aria-label="{{ category|capitalize }}"></i>
+        {% elif category == "info" %}
+            <i class="bi bi-info-circle-fill me-2" role="img" aria-label="{{ category|capitalize }}"></i>
+        {% else %}
+            <i class="bi bi-exclamation-triangle-fill me-2" role="img" aria-label="{{ category|capitalize }}"></i>
+        {% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+{% endif %}

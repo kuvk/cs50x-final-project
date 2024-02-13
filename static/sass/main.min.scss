@@ -1,0 +1,51 @@
+// Required
+@import "../node_modules/bootstrap/scss/functions";
+
+// change bootstrap colors
+$primary: #6B952F;
+$secondary: #6f6f6f;
+
+// change input colors
+$input-placeholder-color: $secondary;
+$input-color: $primary;
+$input-border-color: $primary;
+
+// Flashed messages bottom margin and y padding 
+$alert-padding-y:                   .5rem; 
+$alert-margin-bottom:               .5rem; 
+
+// Navbar links color
+$navbar-light-color:                rgba(#fff, 1);
+$navbar-light-hover-color:          #fff;
+$navbar-light-active-color:         $primary;
+
+// Navbar brand color
+$navbar-light-brand-color:          #fff;
+$navbar-light-brand-hover-color:    #fff;
+
+// Navbar toggle button color
+$navbar-light-icon-color:           rgba(#fff, 1);
+$navbar-light-toggler-border-color: rgba(#fff, .15);
+
+// Dropdown link colors
+$dropdown-link-color:               #fff;
+$dropdown-link-hover-color:         rgba($primary, .8);
+
+// Tables
+$table-color:                       $secondary;
+$table-border-color:                rgba($secondary, .6);
+
+// Lists
+$list-group-color:                  $secondary;
+$list-group-border-color:           rgba($primary, .6);
+
+
+// Required
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/variables-dark";
+@import "../node_modules/bootstrap/scss/maps";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/root";
+
+// import bootstrap
+@import '../node_modules/bootstrap/scss/bootstrap';

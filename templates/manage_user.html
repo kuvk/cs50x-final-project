@@ -1,0 +1,155 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    Manage {{ user.name }}
+{% endblock title %}
+
+{% block header %}
+    {% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+
+<div class="container-md p-3 my-5 justify-content-center text-secondary">
+    {# Manage User header #}
+    <div class="row align-items-end">
+        <div class="col">
+            <h1 class="h3 mb-1 fw-bold"><i class="bi bi-person-fill me-2"></i><span>{{ user.name }}</span></h1>
+        </div>
+        <div class="col-7 col-sm text-end text-bottom">
+            {# Edit User Collpase Show button  #}
+            <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#editUserCollapse" role="button" aria-expanded="false" aria-controls="editUserCollapse">
+                <span><i class="bi bi-pencil-fill align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Edit</span>
+            </a>
+            {# Delete User Modal Show button #}
+            <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Delete</span>
+            </a>
+        </div>
+        <hr class="mt-1 mb-5 border-primary">
+        {# Delete User Modal #}
+        <div class="modal fade" id="deleteUserModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog text-primary">
+                <div class="modal-content text-center">
+                    <div class="modal-header justify-content-center">
+                        <h1 class="modal-title fs-5 fw-bold" id="deleteUserModalLabel">Are you sure?</h1>
+                    </div>
+                    <div class="modal-body">
+                        <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                            <p><span class="text-danger fs-5"><strong>{{ user.name }}</strong></span></p>
+                            <p>
+                            <strong>This action cannot be undone!</strong>    
+                            </p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{{ url_for('delete_user', id=user.id) }}" role="button" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Flashed messages #}
+    {% include "base/flashed_messages.html" %}
+
+    {# Edit User Collapse Form #}
+    <div class="collapse" id="editUserCollapse">
+        <form action="/users/manage/{{ user.id }}"  method="post" class="row g-3 px-3 align-items-center justify-content-between justify-content-lg-center" aria-describedby="#editUserHelp">
+            {{ form.hidden_tag() }}
+            <div class="col-12 col-sm-4 col-lg-2">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control form-control-sm", aria_label="Name", value=user.name)}}
+            </div>
+        
+            <div class="col-12 col-sm-4 col-lg-2">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control form-control-sm", value=user.username, aria_label="Username")}}
+            </div>
+        
+            <div class="col-12 col-sm-4 col-lg-2">
+                {{ form.privilege.label(class="form-label") }}
+                {{ form.privilege(class="form-select form-select-sm", value=user.privilege, aria_label="User role")}}      
+            </div>
+            <div class="col-12 col-lg-1 text-center align-self-end">
+                {{ form.submit(class="btn btn-sm btn-secondary shadow mt-3 mt-lg-0")}}
+            </div>
+        </form>
+        <div class="d-block text-center mt-5">
+            <a class="text-decoration-none mt-5 fs-5 fw-bold" data-bs-toggle="collapse" href="#editUserCollapse" role="button" aria-expanded="true" aria-controls="editUserCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary">    
+    </div>
+
+    {# Edit User Help #}
+    <div id="editUserHelp" class="row justify-content-center align-items-center text-secondary  text-center">
+        <p class="px-5">
+            To edit user information and change role, click <strong><i class="bi bi-pencil-fill mx-1"></i>Edit</strong>. 
+            <br>To delete user click <strong><i class="bi bi-x-circle mx-1"></i>Delete</strong>. 
+        </p>
+        {# Return to Users Link #}
+        <a class="text-decoration-none align-self-end" href="{{ url_for('users') }}">
+            <i class="bi bi-arrow-left me-2"></i>
+            <strong>Back to Users</strong>
+        </a>  
+    </div>
+
+    {# User Info header #}
+    <div class="row mt-5 align-items-end">
+        <div class="col">
+            <h4 class="fw-bold"><i class="bi bi-info-circle-fill me-2"></i><span>User Info</span></h4>
+        </div>
+        <hr class="mb-5 border-primary">
+    </div>
+
+    {# User Info #}
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-8 col-lg-5">
+            <ul class="list-group list-group-flush fw-bold">
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>ID:</span>
+                        <span>{{ user.id }}</span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>Full name:</span>
+                        <span>{{ user.name }}</span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>Username:</span>
+                        <span>{{ user.username }}</span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>Role:</span>
+                        <span>{{ user.role.name }}</span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <span>Date:</span>
+                        <span>{{ user.date.strftime("%d %b %Y") }}</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock main %}
+
+{% block footer %}
+    {% include "base/footer.html" %}
+{% endblock footer%}

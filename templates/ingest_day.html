@@ -1,0 +1,423 @@
+{% extends "base/layout.html"%}
+
+{% block title %}
+    {{ day }}
+{% endblock title %}
+
+{% block header %}
+    {% include "base/header.html" %}
+{% endblock header %}
+
+
+{% block main %}
+
+<div class="container-md p-3 my-5 justify-content-center text-secondary">
+    {# Day header #}
+    <div class="row align-items-end">
+        <div class="col">
+            <h1 class="h3 mb-1 fw-bold"><i class="d-none d-sm-inline bi bi-calendar-event me-2"></i><span>{{ day }}</span></h1>
+        </div>
+        <div class="col-7 col-sm text-end text-bottom">
+            {# Edit Day Collapse Show button  #}
+            <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#editDayCollapse" role="button" aria-expanded="false" aria-controls="editDayCollapse">
+                <span><i class="bi bi-pencil-fill align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Edit</span>
+            </a>
+            {# Delete Day Modal Show button #}
+            <a role="button" class="text-decoration-none text-danger mx-2 fs-5 fw-bold" data-bs-toggle="modal" data-bs-target="#deleteDay">
+                <span><i class="bi bi-x-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Delete</span>
+            </a>
+        </div>
+        <hr class="my-1 border-primary">
+        {# Day date #}
+        <div class="row mb-4 mt-0">
+            <h6 class="fw-bold">{{ day.date.strftime("%d %b %Y") }}</h6>
+        </div>
+        {# Delete Day Modal #}
+        <div class="modal fade" id="deleteDay" tabindex="-1" aria-describedby="deleteDayLabel" aria-hidden="true">
+            <div class="modal-dialog text-primary">
+                <div class="modal-content text-center">
+                    <div class="modal-header justify-content-center">
+                        <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                    </div>
+                    <div class="modal-body" id="deleteDayLabel">
+                        <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                            <p><span class="text-danger fs-5 align-middle"><strong>{{ day }}</strong></span></p>
+                            <p>
+                                All ingests for this day will be lost.<br>
+                                <strong>This action cannot be undone!</strong> 
+                            </p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{{ url_for('delete_day', id=day.id) }}" role="button" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>     
+
+    {# Flashed messages #}
+    {% include "base/flashed_messages.html" %}
+    
+    {# Edit Day Form Collapse #}
+    <div class="collapse" id="editDayCollapse">
+            
+        <form action="/ingest/day/{{ day.id }}/edit"  method="post" class="row g-3 px-3 align-items-center justify-content-center" aria-describedby="#dayHelp">
+            {{ form.hidden_tag() }}
+            <div class="col-8 col-sm-4 col-md-2">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control form-control-sm") }}
+            </div>
+        
+            <div class="col-8 col-sm-4 col-md-2">
+                {{ form.date.label(class="form-label") }}
+                {{ form.date(class="form-control form-control-sm") }}
+            </div>
+            <div class="col-8 col-md-2 col-lg-1 text-center text-md-start align-self-end">
+                {{ form.submit(class="btn btn-sm btn-secondary fw-bold my-3 my-md-0") }}
+            </div>
+        </form>
+        <div class="d-block text-center mt-5">
+            <a class="text-decoration-none mt-5 fs-5 fw-bold" data-bs-toggle="collapse" href="#editDayCollapse" role="button" aria-expanded="true" aria-controls="editDayCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary"> 
+    </div>
+    
+    {# Day Help #}
+    <div id="dayHelp" class="row justify-content-center align-items-center text-center">
+        <p class="px-5">
+            To edit day information, simply click <i class="bi bi-pencil-fill mx-1"></i><strong>Edit</strong>, enter new information and submit. To delete day click <i class="bi bi-x-circle mx-1"></i><strong>Delete</strong>. <br>
+            To log new ingest, click <i class="bi bi-plus-circle mx-1"></i><strong>Add</strong>. <br>
+            If you need help logging ingests, click <i class="bi bi-question-circle mx-1"></i><strong>Help</strong>.
+        </p>
+        <p class="px-5 m-0">
+            <a class="text-decoration-none align-self-end me-2" href="{{ url_for('ingest') }}">
+                <i class="bi bi-arrow-left me-2"></i>
+                <strong>Back to Ingest</strong>
+            </a>
+        </p>     
+    </div>
+
+    {# Ingest Log header #}
+    <div class="row  mt-5 align-items-end">
+        <div class="col-8">
+            <h4 class="mb-1 fw-bold"><i class="bi bi-journal-text me-2"></i><span class="d-none d-sm-inline">Ingest Log</span></h4>
+        </div>
+        
+        <div class="col text-end text-bottom">
+            {# Add Ingest Collapse button #}
+            <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#addIngestCollapse" role="button" aria-expanded="false" aria-controls="addIngestCollapse">
+                <span><i class="bi bi-plus-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Add</span>
+            </a>
+            {# Ingest Help Collapse button #}
+            <a class="text-decoration-none mx-2 fs-5 fw-bold" data-bs-toggle="collapse" href="#ingestHelpCollapse" role="button" aria-expanded="false" aria-controls="ingestHelpCollapse">
+                <span><i class="bi bi-question-circle align-middle me-1 mb-2 mb-sm-0"></i></span>
+                <span class="d-none d-sm-inline align-middle">Help</span>
+            </a>
+            
+        </div>
+        <hr class="mb-5 mt-1 border-primary">
+    </div>
+    
+    {# Ingest Help Collapse #}
+    <div class="collapse" id="ingestHelpCollapse">
+        <div id="ingestHelp" class="row px-md-5 justify-content-center align-items-center text-center">
+            <p class="px-5">
+                First enter ingest group number, select reporter and card, specify clip start and end, enter label for used equipment (eg. CAMERA-1) and equipment operator name. Entering existing group number for another ingest from the same reporter will link ingests, indicating that material in both ingests is connected somehow (eg. video material from one card, and audio from another, both received from the same reporter). You cannot use same group number for different reporters. If any material between different reporters is linked, specify it in additional information. (eg. Two multicam takes with Reporter 1 crew, TC: 00:00h.)
+            </p>
+            <p class="px-5 fw-bold">All fields except Additional Information are required.</p>
+            <p class="px-5">
+                Click <i class="bi bi-info-circle mx-1"></i> next to ingest to check additional information, if any. <br>To delete ingest from log click <i class="bi bi-x-circle mx-1"></i> next to ingest. To delete all logged ingests click <i class="bi bi-journal-x mx-1"></i><strong>Clear Log</strong>.
+            </p>
+        </div>
+        <div class="d-block mt-5 text-center">
+            <a class="text-decoration-none fs-5 fw-bold" data-bs-toggle="collapse" href="#ingestHelpCollapse" role="button" aria-expanded="true" aria-controls="ingestHelpCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary"> 
+    </div>
+
+    {# Add Ingest Collapse Form  #}
+    <div class="collapse" id="addIngestCollapse">
+        {% if available_reporters %}
+        <form action="/ingest/day/{{ day.id }}/add" class="row justify-content-center" method="post" aria-describedby="#ingestHelp">
+            {{ ingest_form.hidden_tag() }}
+            <div class="col-10 col-sm-8 col-lg-6">
+                <div class="row justify-content-center">
+                    <div class="col-4">
+                        {{ ingest_form.group.label(class="form-label") }}
+                        {{ ingest_form.group(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-4">
+                        {{ ingest_form.reporter.label(class="form-label") }}
+                        {{ ingest_form.reporter(class="form-select form-select-sm") }}
+                    </div>
+                    <div class="col-4">
+                        {{ ingest_form.card.label(class="form-label") }}
+                        {{ ingest_form.card(class="form-select form-select-sm") }}
+                    </div>
+                    <div class="col-6">
+                        {{ ingest_form.clip_start.label(class="form-label") }}
+                        {{ ingest_form.clip_start(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-6">
+                        {{ ingest_form.clip_end.label(class="form-label") }}
+                        {{ ingest_form.clip_end(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-6">
+                        {{ ingest_form.equipment.label(class="form-label") }}
+                        {{ ingest_form.equipment(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-6">
+                        {{ ingest_form.operator.label(class="form-label") }}
+                        {{ ingest_form.operator(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-12">
+                        {{ ingest_form.info.label(class="form-label") }}
+                        {{ ingest_form.info(class="form-control form-control-sm", rows='3') }}
+                    </div>
+                    <div class="col-8 text-center align-self-end">
+                        {{ ingest_form.submit(class="btn btn-sm btn-secondary fw-bold mt-4 mb-5") }}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {% else %}
+        <div class="text-center fs-5">
+            No available <strong>Reporters</strong> with at least one <strong>Card</strong> assigned to them.
+        </div>
+        <div class="row my-5 text-center">
+            <a class="text-decoration-none align-self-end ms-auto pe-3" href="{{ url_for('reporters') }}">
+                <i class="bi bi-arrow-right me-2"></i>
+                <strong>Go to Reporters</strong>
+            </a>
+        </div>
+
+        {% endif %}
+        <div class="d-block text-center">
+            <a class="text-decoration-none fs-5 fw-bold" data-bs-toggle="collapse" href="#addIngestCollapse" role="button" aria-expanded="true" aria-controls="addIngestCollapse">
+                <span><i class="bi bi-arrow-up align-middle"></i></span>
+                <span class="ms-1 align-middle">Hide</span>
+            </a>
+        </div>
+        <hr class="my-5 border-primary"> 
+    </div>
+
+    {# Ingest Log #}
+    <div class="row">
+        {% if ingests %}
+        {# Table Search and Clear Ingest Log button #}
+        <div class="d-flex justify-content-between my-2">
+            <div id="searchPlaceLog"></div>
+            <div class="d-inline align-self-end ms-2">
+                
+                <a type="button" class="btn btn-sm btn-danger shadow py-1 " name="{{ day.id }}" id="clearLog"><i class="bi bi-journal-x align-middle m-0 me-sm-1"></i><span class="d-none d-sm-inline align-middle">Clear Log</span></a>
+            </div>
+        </div>
+
+        {# Table #}
+        <table id="ingestLog" class="table table-borderless table-sm text-center responsive nowrap align-middle py-3" width="100%">  
+            <thead class="table-primary">
+                <tr> 
+                    <th scope="col">Group</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Card</th>
+                    <th scope="col">Equipment</th>
+                    <th scope="col">Clip Start</th>
+                    <th scope="col">Clip End</th>
+                    <th scope="col">Operator</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead> 
+            <tbody>
+                {% for ingest in ingests %}
+                <tr scope="row">
+                    <td>{{ ingest.number }}.  {{ ingest.reporter }}</td>
+                    <td>{{ ingest.time.strftime("%H:%M h") }}</td>
+                    <td>{{ ingest.card.card_type|upper }}</td>
+                    <td>{{ ingest.card }}</td> 
+                    <td>{{ ingest.equip_label }}</td>
+                    <td>{{ ingest.clip_start }}</td>
+                    <td>{{ ingest.clip_end }}</td>
+                    <td>{{ ingest.equip_operator }}</td>
+                    {# Ingest Info Popover#}
+                    <td>
+                        {% if ingest.info %}
+                        <a class="text-decoration-none info-ingest text-primary align-middle" tabindex="0" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="left" data-bs-content="{{ ingest.info }}">
+                            <i class="bi bi-info-circle align-middle"></i>
+                        </a> 
+                        <span class="align-middle mx-2">|</span>
+                        {% endif %}
+                        <a class="text-decoration-none delete-ingest text-danger align-middle" type="button" name="{{ ingest }}" id="{{ ingest.id }}"><i class="bi bi-x-circle align-middle"></i></a> 
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {# Delete Ingest Modal #}
+        <div class="modal fade" id="deleteIngestModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="deleteIngestLabel" aria-hidden="true">
+            <div class="modal-dialog text-primary">
+                <div class="modal-content text-center">
+                    <div class="modal-header justify-content-center">
+                        <h1 class="modal-title fs-5 fw-bold">Are you sure?</h1>
+                    </div>
+                    <div class="modal-body" id="deleteIngestLabel">
+                        <i class="bi bi-x-circle text-danger fs-4 align-middle"></i>
+                        <p><span class="text-danger fs-5 align-middle"><strong id="ingestName"></strong></span></p>
+                        <p>
+                            <strong>This action cannot be undone!</strong> 
+                        </p>
+                    </div>
+                    {# Cancel and Delete buttons #}
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                        <a id="deleteIngest" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        {# No ingests #}
+        <p class="fs-5 px-5 text-center">
+            Ingest log for <strong>{{ day }}</strong> is empty.
+        </p>
+
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock main %}
+
+{% block footer %}
+    {% include "base/footer.html" %}
+{% endblock footer%}
+
+{% block js %}
+
+{# Add Ingest Form - Get cards assigned to reporter for cards select options #}
+<script>
+    let reporter_select = document.getElementById('reporter');
+    let card_select = document.getElementById('card');
+
+    // Function to get cards select options for selected reporter
+    reporter_select.onchange = function() {
+        reporter = reporter_select.value;
+        
+        // Get assigned cards as JSON
+        fetch('/ingest/' + reporter + '/cards').then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+                // Add select options
+                for (let card of data.cards) {
+                    optionHTML += '<option value="' + card.id + '">' + card.label + '</option>';
+                }
+
+                card_select.innerHTML = optionHTML;
+            });
+        });
+    };
+</script>
+
+{% if ingests %}
+{# Enable Popovers #}
+<script>
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+</script>
+
+{# Ingest Log DataTable, Delete Ingest and Delete all functions #}
+<script>
+    // Create DataTable
+    // Define subheading data column - Ingest number (Group)
+    var groupColumn = 0;
+    var table = $('#ingestLog').DataTable({
+        // Define columns
+        columnDefs: [
+            { responsivePriority: 1, targets: [0, 1] },
+            { responsivePriority: 2, targets: [-1, 3] },
+            { visible: false, targets: groupColumn }, // hide subheading column
+            { className: 'dt-head-center', targets: '_all' },
+            { orderable: false, targets: [-1, 5, 6] },
+            { searchable: false, targets: [-1, 5, 6] }
+        ],
+        order: [[groupColumn, 'asc']],
+        paging: false,
+        info: false,
+        
+        // Create subheadings by grouping data in column and reorder as rows
+        drawCallback: function (settings) {
+            var api = this.api();
+            var rows = api.rows({ page: 'current' }).nodes();
+            var last = null;
+    
+            api.column(groupColumn, { page: 'current' })
+                .data()
+                .each(function (group, i) {
+                    if (last !== group) {
+                        $(rows)
+                            .eq(i)
+                            .before(
+                                '<tr class="group fw-bold table-light text-start fs-5"><td colspan="8" class="ps-3">' +
+                                    group +
+                                    '</td></tr>'
+                            );
+    
+                        last = group;
+                    }
+                });
+        }
+    });
+
+    // Reorder on subheading click 
+    $('#ingestLog tbody').on('click', 'tr.group', function () {
+        var currentOrder = table.order()[0];
+        if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+            table.order([groupColumn, 'desc']).draw();
+        }
+        else {
+            table.order([groupColumn, 'asc']).draw();
+        }
+    });
+
+    // Change table Search to specific div, to change position
+    $("#searchPlaceLog").html($("#ingestLog_filter")); 
+
+    // Delete Ingest button - Function to trigger deleteIngestModal, pass ingest to modal body and url to modal delete button  
+    $(".delete-ingest").on("click", function () {
+        var ingest = $(this).attr("name");
+        var day = $('#clearLog').attr("name");
+        var url = '/ingest/delete/' + day + '/' + $(this).attr("id");
+
+        $("#ingestName").html(ingest) // pass ingest to modal
+        $("#deleteIngest").attr("href", url); // pass url to delete button
+        $("#deleteIngestModal").modal("show"); // show modal
+    });
+
+    // Clear Ingest Log button - Function to trigger deleteIngestModal, pass url to modal delete button  
+    $("#clearLog").on("click", function () {
+        var day = $(this).attr("name");
+        var url = '/ingest/delete/' + day + '/log';
+
+        $("#ingestName").html("Delete all logged ingests.")
+        $("#deleteIngest").attr("href", url); // pass url to delete button
+        $("#deleteIngestModal").modal("show"); // show modal
+    });
+</script>
+
+{% endif %}
+
+{% endblock js %}
