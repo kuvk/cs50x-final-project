@@ -1,9 +1,9 @@
 # CS50 Final Project - Book of Ingest 
 #### Description:
  
-Book of Ingest is a responsive **Flask** web application that can be used to keep ingest logs and manage SD cards inventory for your project. It should be useful to **Loggers** and **Data Imaging Technicians** in charge of ingesting and archiving footage, whether they work in a postproduction fascility or on the set.
+This app was developed as a final project for HarvardX CS50’s Introduction to Computer Science. Everything is left as submitted in 2023.
 
-This app was developed as a final project for HarvardX CS50’s Introduction to Computer Science.
+Book of Ingest is a responsive **Flask** web application that can be used to keep ingest logs and manage SD cards inventory for your project. It should be useful to **Loggers** and **Data Imaging Technicians** in charge of ingesting and archiving footage, whether they work in a postproduction fascility or on the set.
 
 ## Project Idea
 My current job is working as a DIT for a video production company. We had this this project, a reality show, that was shot in a rural area and postproduction fascility was pretty far from the set. 
